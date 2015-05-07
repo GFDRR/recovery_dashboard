@@ -879,6 +879,21 @@ input[type="submit"] {
       width: 150px;
       background: rgba(200, 200, 200, 0.7);
       padding: 10px; }
+    /* line 40, /Development/projects/worldbank/dashboard/production/recovery_dashboard/source/stylesheets/components/_layers.sass */
+    #recovery-dashboard #layers .layer .sub-styles {
+      clear: left;
+      float: left;
+      margin: 10px 0 0 15px; }
+      /* line 44, /Development/projects/worldbank/dashboard/production/recovery_dashboard/source/stylesheets/components/_layers.sass */
+      #recovery-dashboard #layers .layer .sub-styles .subcheck {
+        clear: left;
+        float: left; }
+        /* line 47, /Development/projects/worldbank/dashboard/production/recovery_dashboard/source/stylesheets/components/_layers.sass */
+        #recovery-dashboard #layers .layer .sub-styles .subcheck input {
+          float: left; }
+        /* line 49, /Development/projects/worldbank/dashboard/production/recovery_dashboard/source/stylesheets/components/_layers.sass */
+        #recovery-dashboard #layers .layer .sub-styles .subcheck p {
+          float: left; }
 
 /* line 2, /Development/projects/worldbank/dashboard/production/recovery_dashboard/source/stylesheets/components/_popup.sass */
 #recovery-dashboard #popup {

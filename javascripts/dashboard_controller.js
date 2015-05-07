@@ -2,7 +2,7 @@
   var RecoveryDashboardCtrl;
 
   RecoveryDashboardCtrl = (function() {
-    function RecoveryDashboardCtrl($scope, $http, olData, olHelpers, layerListModel) {
+    function RecoveryDashboardCtrl($scope, $http, olData, olHelpers, layerListModel, styleHelper) {
       $scope.hideMetadata = function() {
         return this.layer.metadata.show = false;
       };
@@ -15,6 +15,10 @@
       $scope.toggleDisplayed = function() {
         this.layer.displayed = !this.layer.displayed;
         return this.layer.visible = this.layer.displayed;
+      };
+      $scope.styleHelper = styleHelper;
+      $scope.changeStyle = function() {
+        return this.layer.style = $scope.styleHelper[this.styleOptions.styleParam];
       };
       angular.extend($scope, {
         defaults: {
@@ -59,13 +63,14 @@
         return $scope.$on('openlayers.layers.roads.click', showPopup);
       });
       $scope.layerGroups = layerListModel.layerGroups;
+      $scope.layerList = layerListModel.list;
     }
 
     return RecoveryDashboardCtrl;
 
   })();
 
-  RecoveryDashboardCtrl.$inject = ['$scope', '$http', 'olData', 'olHelpers', 'layerListModel'];
+  RecoveryDashboardCtrl.$inject = ['$scope', '$http', 'olData', 'olHelpers', 'layerListModel', 'styleHelper'];
 
   window.dashboard.controller("RecoveryDashboardCtrl", RecoveryDashboardCtrl);
 
