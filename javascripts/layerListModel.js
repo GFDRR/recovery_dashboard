@@ -1,7 +1,7 @@
 (function() {
-  window.dashboard.service('layerListModel', [
+  angular.module('dashboard').service('layerListModel', [
     '$rootScope', 'styleHelper', function($rootScope, styleHelper) {
-      var damagedBuildingsLayer, hotosmLayer, landslideLayer, mediaLayer, medicalLayer, medicalPolygonLayer, povertyLayer, roadsLayer, schoolLayer, schoolPolygonLayer, trainStationsLayer;
+      var damagedBuildingsLayer, hotosmLayer, landslideLayer, landslidesBGSLayer, mediaLayer, medicalLayer, medicalPolygonLayer, nasaLayer, povertyLayer, roadsLayer, schoolLayer, schoolPolygonLayer, trainStationsLayer, valleyBlockingLayer, valleyLandslidesLayer;
       hotosmLayer = {
         name: 'HOTOSM',
         active: true,
@@ -17,10 +17,13 @@
         displayed: true,
         index: 1,
         source: {
-          type: 'TopoJSON',
-          url: 'data/poverty.json'
+          type: 'ImageWMS',
+          url: 'http://demo.geonode.org/geoserver/wms',
+          params: {
+            layers: "geonode:archiv",
+            query_layers: "geonode:archiv"
+          }
         },
-        style: styleHelper.povertyAvgStyle,
         selectedStyle: "povertyAvgStyle",
         styleOptions: [
           {
@@ -49,15 +52,7 @@
           name: "School Polygons",
           source: "OSM"
         },
-        style: {
-          fill: {
-            color: "blue"
-          },
-          stroke: {
-            width: 4,
-            color: "blue"
-          }
-        }
+        style: styleHelper.schoolPolygonStyle
       };
       trainStationsLayer = {
         name: 'train_stations',
@@ -91,6 +86,12 @@
         metadata: {
           name: "Main roads",
           source: "OSM"
+        },
+        style: {
+          stroke: {
+            color: '#E0D6B2',
+            width: 2
+          }
         }
       };
       medicalPolygonLayer = {
@@ -105,15 +106,7 @@
           name: "Medical facilities Polygons",
           source: "OSM"
         },
-        style: {
-          fill: {
-            color: "red"
-          },
-          stroke: {
-            width: 4,
-            color: "red"
-          }
-        }
+        style: styleHelper.medicalPolygonStyle
       };
       medicalLayer = {
         name: 'medical',
@@ -123,13 +116,7 @@
           type: 'GeoJSON',
           url: 'http://nepal.piensa.co/data/medical_point.json'
         },
-        style: {
-          image: {
-            icon: {
-              src: 'images/icons/hospital-12.png'
-            }
-          }
-        },
+        style: styleHelper.medicalStyle,
         metadata: {
           name: "Medical facilities",
           source: "OSM"
@@ -148,27 +135,61 @@
           name: "Schools",
           source: "OSM"
         },
-        style: {
-          image: {
-            icon: {
-              src: 'images/icons/school-12.png'
-            }
-          }
-        }
+        style: styleHelper.schoolStyle
       };
-      mediaLayer = {
-        name: 'media-layer',
+      landslidesBGSLayer = {
+        name: 'landslides-bgs',
         active: true,
         displayed: true,
         source: {
-          type: 'GeoJSON',
-          url: 'data/media.geojson'
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/landslides-bgs/{z}/{x}/{y}.geojson'
         },
-        style: function(feature, resolution) {
-          debugger;
+        metadata: {
+          name: "Landslides BGS",
+          source: "Worldbank"
+        }
+      };
+      mediaLayer = {
+        name: 'media',
+        active: true,
+        displayed: true,
+        source: {
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/media/{z}/{x}/{y}.geojson'
         },
         metadata: {
           name: "Mainstream Media text",
+          source: "Worldbank"
+        }
+      };
+      valleyLandslidesLayer = {
+        name: 'valley-landslides',
+        active: true,
+        displayed: true,
+        source: {
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/valley-landslides/{z}/{x}/{y}.geojson'
+        },
+        metadata: {
+          name: "Valley Landslides",
+          source: "Worldbank"
+        }
+      };
+      valleyBlockingLayer = {
+        name: 'valley-blocking',
+        active: true,
+        displayed: true,
+        source: {
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/valley-blocking/{z}/{x}/{y}.geojson'
+        },
+        metadata: {
+          name: "Valley Blockings",
           source: "Worldbank"
         }
       };
@@ -177,8 +198,9 @@
         active: true,
         displayed: true,
         source: {
-          type: 'GeoJSON',
-          url: 'data/landslides.geojson'
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/landslides-all/{z}/{x}/{y}.geojson'
         },
         metadata: {
           name: "Landslides",
@@ -187,21 +209,42 @@
       };
       damagedBuildingsLayer = {
         name: 'damagedBuildings',
-        active: true,
+        active: false,
         displayed: true,
         source: {
-          type: 'GeoJSON',
-          url: 'data/buildings.geojson'
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/damaged-buildings/{z}/{x}/{y}.geojson'
         },
         metadata: {
           name: "Damages Buildings",
           source: "Worldbank"
         }
       };
+      nasaLayer = {
+        name: 'nasa',
+        active: true,
+        displayed: true,
+        source: {
+          type: 'TileVector',
+          format: new ol.format.GeoJSON(),
+          url: 'http://52.7.33.4/nasa/{z}/{x}/{y}.geojson'
+        },
+        metadata: {
+          name: "Damages from NASA",
+          source: "NASA"
+        }
+      };
       this.layerGroups = [
         {
           name: "Poverty",
           layers: [povertyLayer]
+        }, {
+          name: "Landslides",
+          layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer]
+        }, {
+          name: "Damages",
+          layers: [damagedBuildingsLayer, nasaLayer]
         }, {
           name: "Media",
           layers: [mediaLayer]
@@ -213,11 +256,7 @@
           layers: [schoolLayer, schoolPolygonLayer, medicalLayer, medicalPolygonLayer]
         }
       ];
-      this.list = _.unique(_.flatten([
-        _.collect(this.layerGroups, function(group) {
-          return group.layers;
-        }).reverse(), hotosmLayer
-      ])).reverse();
+      this.baseLayer = hotosmLayer;
       return this;
     }
   ]);
