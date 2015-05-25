@@ -4,10 +4,11 @@
   RecoveryDashboardCtrl = (function() {
     function RecoveryDashboardCtrl($scope, $http, olData, olHelpers, layerListService, styleHelper) {
       $scope.hideMetadata = function() {
-        return this.layer.metadata.show = false;
+        return $scope.metadata.show = false;
       };
-      $scope.showMetadata = function() {
-        return this.layer.metadata.show = true;
+      $scope.toggleMetadata = function() {
+        this.layer.metadata.show = !this.layer.metadata.show;
+        return $scope.metadata = this.layer.metadata;
       };
       $scope.toggleVisibility = function() {
         return this.layer.visible = this.layer.displayed;
@@ -49,7 +50,7 @@
           layer = map.forEachLayerAtPixel(pixel, (function(layer) {
             return layer;
           }), map, function(layer) {
-            return layer.get('name') === 'poverty';
+            return layer.get('name') === 'poverty' || layer.get('name') === 'db-admin';
           });
           if (layer && !$scope.overlayLock) {
             viewResolution = map.getView().getResolution();
@@ -59,7 +60,7 @@
             });
             return $http.get(url).success(function(feature) {
               var overlayHidden;
-              $scope.name = 'poverty';
+              $scope.name = layer.get('name');
               $scope.properties = feature ? feature.features[0].properties : {};
               $scope.sourceType = 'worldbank';
               overlayHidden = true;
