@@ -7,8 +7,14 @@
         return $scope.metadata.show = false;
       };
       $scope.toggleMetadata = function() {
-        this.layer.metadata.show = !this.layer.metadata.show;
-        return $scope.metadata = this.layer.metadata;
+        if (this.combinedLayer) {
+          this.combinedLayer.metadata.show = !this.combinedLayer.metadata.show;
+          $scope.metadata = this.combinedLayer.metadata;
+        }
+        if (this.layer) {
+          this.layer.metadata.show = !this.layer.metadata.show;
+          return $scope.metadata = this.layer.metadata;
+        }
       };
       $scope.toggleVisibility = function() {
         return this.layer.visible = this.layer.displayed;
@@ -17,9 +23,41 @@
         this.layer.displayed = !this.layer.displayed;
         return this.layer.visible = this.layer.displayed;
       };
+      $scope.resetCombinedLayers = function() {
+        var displayed;
+        displayed = this.combinedLayer.displayed;
+        return _.each(this.combinedLayer.layers, function(layer) {
+          return layer.visible = displayed;
+        });
+      };
+      $scope.showCombinedLayers = function() {
+        return _.each(this.combinedLayer.layers, function(layer) {
+          return layer.visible = true;
+        });
+      };
+      $scope.toggleCombinedDisplayed = function() {
+        var displayed;
+        this.combinedLayer.displayed = !this.combinedLayer.displayed;
+        displayed = this.combinedLayer.displayed;
+        return _.each(this.combinedLayer.layers, function(layer) {
+          layer.visible = displayed;
+          return layer.displayed = displayed;
+        });
+      };
       $scope.styleHelper = styleHelper;
       $scope.changeStyle = function() {
         return this.layer.style = $scope.styleHelper[this.styleOptions.styleParam];
+      };
+      $scope.showGroup = function() {
+        var activateGroup;
+        activateGroup = this.group;
+        return _.each($scope.layerGroups, function(group) {
+          if (group === activateGroup) {
+            return group.active = true;
+          } else {
+            return group.active = false;
+          }
+        });
       };
       angular.extend($scope, {
         defaults: {

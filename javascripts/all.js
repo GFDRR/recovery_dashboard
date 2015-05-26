@@ -50437,7 +50437,7 @@ var colorbrewer = {YlGn: {
         name: 'poverty',
         active: true,
         displayed: false,
-        index: 1,
+        visible: false,
         source: {
           type: 'ImageWMS',
           url: 'http://demo.geonode.org/geoserver/wms',
@@ -50520,7 +50520,8 @@ var colorbrewer = {YlGn: {
       medicalPolygonLayer = {
         name: 'medicalpolygon',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'GeoJSON',
           url: 'http://nepal.piensa.co/data/medical_polygon.json'
@@ -50534,7 +50535,8 @@ var colorbrewer = {YlGn: {
       medicalLayer = {
         name: 'medical',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'GeoJSON',
           url: 'http://nepal.piensa.co/data/medical_point.json'
@@ -50563,7 +50565,8 @@ var colorbrewer = {YlGn: {
       landslidesBGSLayer = {
         name: 'landslides-bgs',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50577,7 +50580,8 @@ var colorbrewer = {YlGn: {
       mediaLayer = {
         name: 'media',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50592,7 +50596,8 @@ var colorbrewer = {YlGn: {
       valleyLandslidesLayer = {
         name: 'valley-landslides',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50606,7 +50611,8 @@ var colorbrewer = {YlGn: {
       valleyBlockingLayer = {
         name: 'valley-blocking',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50620,7 +50626,8 @@ var colorbrewer = {YlGn: {
       landslideLayer = {
         name: 'landslides',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50634,7 +50641,8 @@ var colorbrewer = {YlGn: {
       damagedBuildingsLayer = {
         name: 'damagedBuildings',
         active: false,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50648,7 +50656,8 @@ var colorbrewer = {YlGn: {
       nasaLayer = {
         name: 'nasa',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -50661,23 +50670,44 @@ var colorbrewer = {YlGn: {
       };
       this.layerGroups = [
         {
-          name: "Poverty",
+          name: "Statistics",
+          iconClass: 'briefcase',
+          identifier: 'statistics',
+          active: true,
           layers: [povertyLayer]
         }, {
-          name: "Landslides",
-          layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer]
-        }, {
           name: "Damages",
-          layers: [damaged_buildings_adminLayer, nasaLayer]
+          iconClass: 'flag',
+          layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer, damagedBuildingsLayer, damaged_buildings_adminLayer, nasaLayer]
         }, {
           name: "Media",
+          iconClass: 'newspaper-o',
           layers: [mediaLayer]
         }, {
           name: "Infrastructure",
-          layers: [roadsLayer, trainStationsLayer]
-        }, {
-          name: "Public Facilities",
-          layers: [schoolLayer, schoolPolygonLayer, medicalLayer, medicalPolygonLayer]
+          iconClass: 'road',
+          layers: [roadsLayer, trainStationsLayer],
+          combinedLayers: [
+            {
+              name: 'Schools',
+              visible: false,
+              displayed: false,
+              layers: [schoolLayer, schoolPolygonLayer],
+              metadata: {
+                name: "Schools",
+                source: "OSM"
+              }
+            }, {
+              name: 'Medical',
+              visible: true,
+              displayed: true,
+              layers: [medicalLayer, medicalPolygonLayer],
+              metadata: {
+                name: "Medical facilities",
+                source: "OSM"
+              }
+            }
+          ]
         }
       ];
       this.baseLayer = hotosmLayer;
@@ -50689,11 +50719,21 @@ var colorbrewer = {YlGn: {
 (function() {
   angular.module('dashboard').service('layerListService', [
     '$rootScope', 'layerListModel', function($rootScope, layerListModel) {
-      this.list = _.unique(_.flatten([
-        _.collect(layerListModel.layerGroups, function(group) {
+      var allLayers, collectCombinedLayers, collectLayers;
+      collectCombinedLayers = function(groups) {
+        return _.collect(groups, function(group) {
+          return collectLayers(group.combinedLayers);
+        });
+      };
+      collectLayers = function(groups) {
+        return _.collect(groups, function(group) {
           return group.layers;
-        }).reverse(), layerListModel.baseLayer
-      ])).reverse();
+        });
+      };
+      allLayers = function(groups) {
+        return _.unique(_.flatten([collectLayers(groups), collectCombinedLayers(groups), layerListModel.baseLayer])).reverse();
+      };
+      this.list = allLayers(layerListModel.layerGroups);
       this.layerGroups = layerListModel.layerGroups;
       return this;
     }
@@ -50709,8 +50749,14 @@ var colorbrewer = {YlGn: {
         return $scope.metadata.show = false;
       };
       $scope.toggleMetadata = function() {
-        this.layer.metadata.show = !this.layer.metadata.show;
-        return $scope.metadata = this.layer.metadata;
+        if (this.combinedLayer) {
+          this.combinedLayer.metadata.show = !this.combinedLayer.metadata.show;
+          $scope.metadata = this.combinedLayer.metadata;
+        }
+        if (this.layer) {
+          this.layer.metadata.show = !this.layer.metadata.show;
+          return $scope.metadata = this.layer.metadata;
+        }
       };
       $scope.toggleVisibility = function() {
         return this.layer.visible = this.layer.displayed;
@@ -50719,9 +50765,41 @@ var colorbrewer = {YlGn: {
         this.layer.displayed = !this.layer.displayed;
         return this.layer.visible = this.layer.displayed;
       };
+      $scope.resetCombinedLayers = function() {
+        var displayed;
+        displayed = this.combinedLayer.displayed;
+        return _.each(this.combinedLayer.layers, function(layer) {
+          return layer.visible = displayed;
+        });
+      };
+      $scope.showCombinedLayers = function() {
+        return _.each(this.combinedLayer.layers, function(layer) {
+          return layer.visible = true;
+        });
+      };
+      $scope.toggleCombinedDisplayed = function() {
+        var displayed;
+        this.combinedLayer.displayed = !this.combinedLayer.displayed;
+        displayed = this.combinedLayer.displayed;
+        return _.each(this.combinedLayer.layers, function(layer) {
+          layer.visible = displayed;
+          return layer.displayed = displayed;
+        });
+      };
       $scope.styleHelper = styleHelper;
       $scope.changeStyle = function() {
         return this.layer.style = $scope.styleHelper[this.styleOptions.styleParam];
+      };
+      $scope.showGroup = function() {
+        var activateGroup;
+        activateGroup = this.group;
+        return _.each($scope.layerGroups, function(group) {
+          if (group === activateGroup) {
+            return group.active = true;
+          } else {
+            return group.active = false;
+          }
+        });
       };
       angular.extend($scope, {
         defaults: {

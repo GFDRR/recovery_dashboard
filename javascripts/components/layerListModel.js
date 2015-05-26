@@ -35,7 +35,7 @@
         name: 'poverty',
         active: true,
         displayed: false,
-        index: 1,
+        visible: false,
         source: {
           type: 'ImageWMS',
           url: 'http://demo.geonode.org/geoserver/wms',
@@ -118,7 +118,8 @@
       medicalPolygonLayer = {
         name: 'medicalpolygon',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'GeoJSON',
           url: 'http://nepal.piensa.co/data/medical_polygon.json'
@@ -132,7 +133,8 @@
       medicalLayer = {
         name: 'medical',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'GeoJSON',
           url: 'http://nepal.piensa.co/data/medical_point.json'
@@ -161,7 +163,8 @@
       landslidesBGSLayer = {
         name: 'landslides-bgs',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -175,7 +178,8 @@
       mediaLayer = {
         name: 'media',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -190,7 +194,8 @@
       valleyLandslidesLayer = {
         name: 'valley-landslides',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -204,7 +209,8 @@
       valleyBlockingLayer = {
         name: 'valley-blocking',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -218,7 +224,8 @@
       landslideLayer = {
         name: 'landslides',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -232,7 +239,8 @@
       damagedBuildingsLayer = {
         name: 'damagedBuildings',
         active: false,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -246,7 +254,8 @@
       nasaLayer = {
         name: 'nasa',
         active: true,
-        displayed: true,
+        displayed: false,
+        visible: false,
         source: {
           type: 'TileVector',
           format: new ol.format.GeoJSON(),
@@ -259,23 +268,44 @@
       };
       this.layerGroups = [
         {
-          name: "Poverty",
+          name: "Statistics",
+          iconClass: 'briefcase',
+          identifier: 'statistics',
+          active: true,
           layers: [povertyLayer]
         }, {
-          name: "Landslides",
-          layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer]
-        }, {
           name: "Damages",
-          layers: [damaged_buildings_adminLayer, nasaLayer]
+          iconClass: 'flag',
+          layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer, damagedBuildingsLayer, damaged_buildings_adminLayer, nasaLayer]
         }, {
           name: "Media",
+          iconClass: 'newspaper-o',
           layers: [mediaLayer]
         }, {
           name: "Infrastructure",
-          layers: [roadsLayer, trainStationsLayer]
-        }, {
-          name: "Public Facilities",
-          layers: [schoolLayer, schoolPolygonLayer, medicalLayer, medicalPolygonLayer]
+          iconClass: 'road',
+          layers: [roadsLayer, trainStationsLayer],
+          combinedLayers: [
+            {
+              name: 'Schools',
+              visible: false,
+              displayed: false,
+              layers: [schoolLayer, schoolPolygonLayer],
+              metadata: {
+                name: "Schools",
+                source: "OSM"
+              }
+            }, {
+              name: 'Medical',
+              visible: true,
+              displayed: true,
+              layers: [medicalLayer, medicalPolygonLayer],
+              metadata: {
+                name: "Medical facilities",
+                source: "OSM"
+              }
+            }
+          ]
         }
       ];
       this.baseLayer = hotosmLayer;
