@@ -1,7 +1,7 @@
 (function() {
   angular.module('dashboard').service('layerListModel', [
     '$rootScope', 'styleHelper', function($rootScope, styleHelper) {
-      var damagedBuildingsLayer, damaged_buildings_adminLayer, hotosmLayer, landslideLayer, landslidesBGSLayer, mediaLayer, medicalLayer, medicalPolygonLayer, nasaLayer, povertyLayer, roadsLayer, schoolLayer, schoolPolygonLayer, trainStationsLayer, valleyBlockingLayer, valleyLandslidesLayer;
+      var damagedBuildingsLayer, damaged_buildings_adminLayer, hotosmLayer, landslideLayer, landslidesBGSLayer, mediaLayer, medicalLayer, medicalPolygonLayer, nasaLayer, povertyLayer, roadsLayer, schoolLayer, schoolPolygonLayer, valleyBlockingLayer, valleyLandslidesLayer;
       hotosmLayer = {
         name: 'HOTOSM',
         active: true,
@@ -18,11 +18,10 @@
         index: 2,
         source: {
           type: 'ImageWMS',
-          url: 'http://demo.geonode.org/geoserver/wms',
+          url: 'http://45.55.174.20/geoserver/wms',
           params: {
-            layers: "geonode:destroyed_buildings",
-            query_layers: "geonode:destroyed_buildings",
-            styles: "destroyed_buildings"
+            layers: "hazard:destroyed_buildings_admin_3",
+            query_layers: "hazard:destroyed_buildings_admin_3"
           }
         },
         metadata: {
@@ -44,16 +43,6 @@
             query_layers: "geonode:archiv"
           }
         },
-        selectedStyle: "povertyAvgStyle",
-        styleOptions: [
-          {
-            styleName: "Avg Poor",
-            styleParam: "povertyAvgStyle"
-          }, {
-            styleName: "Absolute # of Poor",
-            styleParam: "povertyAbsStyle"
-          }
-        ],
         metadata: {
           name: "Poverty Levels",
           source: "Worldbank",
@@ -74,27 +63,6 @@
           source: "OSM"
         },
         style: styleHelper.schoolPolygonStyle
-      };
-      trainStationsLayer = {
-        name: 'train_stations',
-        active: true,
-        displayed: false,
-        visible: false,
-        source: {
-          type: 'GeoJSON',
-          url: 'http://nepal.piensa.co/data/train_stations.json'
-        },
-        metadata: {
-          name: "Train stations",
-          source: "OSM"
-        },
-        style: {
-          image: {
-            icon: {
-              src: 'images/icons/rail-12.png'
-            }
-          }
-        }
       };
       roadsLayer = {
         name: 'roads',
@@ -257,9 +225,12 @@
         displayed: false,
         visible: false,
         source: {
-          type: 'TileVector',
-          format: new ol.format.GeoJSON(),
-          url: 'http://52.7.33.4/nasa/{z}/{x}/{y}.geojson'
+          type: 'ImageWMS',
+          url: 'http://45.55.174.20/geoserver/wms',
+          params: {
+            layers: "hazard:aria_dpm_alos2_f550_v05u_climmax07454_t1h1b0u0_dpmraw",
+            query_layers: "hazard:aria_dpm_alos2_f550_v05u_climmax07454_t1h1b0u0_dpmraw"
+          }
         },
         metadata: {
           name: "Damages from NASA",
@@ -268,7 +239,7 @@
       };
       this.layerGroups = [
         {
-          name: "Statistics",
+          name: "Poverty",
           iconClass: 'briefcase',
           identifier: 'statistics',
           active: true,
@@ -276,7 +247,20 @@
         }, {
           name: "Damages",
           iconClass: 'flag',
-          layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer, damagedBuildingsLayer, damaged_buildings_adminLayer, nasaLayer]
+          layers: [damagedBuildingsLayer, damaged_buildings_adminLayer, nasaLayer],
+          combinedLayers: [
+            {
+              name: 'Landslides',
+              visible: false,
+              displayed: false,
+              layers: [landslideLayer, landslidesBGSLayer, valleyLandslidesLayer, valleyBlockingLayer],
+              metadata: {
+                name: "Landslides",
+                source: "",
+                text: "Location of a large set of landslides detected using satellite images are available in GIS format files. The data was compiled by a consortium international organisations. This dataset is useful when overlaid with the road data as well as watercourses, to identify/infer potential roadblocks and the potential for earth dams to form as a result of water courses being blocked. This inventory can also be used to prioritize areas where mid- to longer term landslide risks should be assessed, given the approaching monsoon season. When overlaid with settlement locations, it may be used to infer “at risk” settlements. In all cases, geologists should be consulted. (also, see “settlement data” section below) It can also be overlaid to identify at risk health clinics and schools in the mountainous areas. The inventory data was compiled on a best effort basis by geologists in each of the organizations involved. G iven cloud cover and limitations in the availability of satellite data etc. there may be missing landslides from this dataset. Link to printable map: http://goo.gl/pa1o3F  "
+              }
+            }
+          ]
         }, {
           name: "Media",
           iconClass: 'newspaper-o',
@@ -284,7 +268,7 @@
         }, {
           name: "Infrastructure",
           iconClass: 'road',
-          layers: [roadsLayer, trainStationsLayer],
+          layers: [roadsLayer],
           combinedLayers: [
             {
               name: 'Schools',
