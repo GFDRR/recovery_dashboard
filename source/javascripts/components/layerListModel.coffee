@@ -65,27 +65,6 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
     }
     style: styleHelper.schoolPolygonStyle
   }
-  trainStationsLayer = {
-    name: 'train_stations',
-    active: true,
-    displayed: false,
-    visible: false,
-    source: {
-      type: 'GeoJSON',
-      url: 'http://nepal.piensa.co/data/train_stations.json'
-    }
-    metadata: {
-      name: "Train stations"
-      source: "OSM"
-    }
-    style: {
-      image: {
-        icon: {
-          src: 'images/icons/rail-12.png'
-        }
-      }
-    }
-  }
   roadsLayer = {
     name: 'roads',
     active: true,
@@ -295,7 +274,6 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
       iconClass: 'road'
       layers: [
         roadsLayer
-        trainStationsLayer
       ]
       combinedLayers: [
         {
