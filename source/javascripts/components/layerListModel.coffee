@@ -44,18 +44,6 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
         query_layers: "geonode:archiv"
       }
     }
-    #style: styleHelper.povertyAvgStyle
-    selectedStyle: "povertyAvgStyle"
-    styleOptions: [
-      {
-        styleName: "Avg Poor"
-        styleParam: "povertyAvgStyle"
-      }
-      {
-        styleName: "Absolute # of Poor"
-        styleParam: "povertyAbsStyle"
-      }
-    ]
     metadata: {
       name: "Poverty Levels"
       source: "Worldbank"
@@ -274,7 +262,7 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
   }
   this.layerGroups = [
     {
-      name: "Statistics"
+      name: "Poverty"
       iconClass: 'briefcase'
       identifier: 'statistics'
       active: true
