@@ -44,18 +44,6 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
         query_layers: "geonode:archiv"
       }
     }
-    #style: styleHelper.povertyAvgStyle
-    selectedStyle: "povertyAvgStyle"
-    styleOptions: [
-      {
-        styleName: "Avg Poor"
-        styleParam: "povertyAvgStyle"
-      }
-      {
-        styleName: "Absolute # of Poor"
-        styleParam: "povertyAbsStyle"
-      }
-    ]
     metadata: {
       name: "Poverty Levels"
       source: "Worldbank"
@@ -76,27 +64,6 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
       source: "OSM"
     }
     style: styleHelper.schoolPolygonStyle
-  }
-  trainStationsLayer = {
-    name: 'train_stations',
-    active: true,
-    displayed: false,
-    visible: false,
-    source: {
-      type: 'GeoJSON',
-      url: 'http://nepal.piensa.co/data/train_stations.json'
-    }
-    metadata: {
-      name: "Train stations"
-      source: "OSM"
-    }
-    style: {
-      image: {
-        icon: {
-          src: 'images/icons/rail-12.png'
-        }
-      }
-    }
   }
   roadsLayer = {
     name: 'roads',
@@ -274,7 +241,7 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
   }
   this.layerGroups = [
     {
-      name: "Statistics"
+      name: "Poverty"
       iconClass: 'briefcase'
       identifier: 'statistics'
       active: true
@@ -325,7 +292,6 @@ angular.module('dashboard').service('layerListModel', ['$rootScope', 'styleHelpe
       iconClass: 'road'
       layers: [
         roadsLayer
-        trainStationsLayer
       ]
       combinedLayers: [
         {
